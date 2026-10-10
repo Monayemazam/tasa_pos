@@ -83,7 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ])->name('expenses');
 
     // Payroll Module Shell Placeholders
-    Route::prefix('payroll')->name('payroll.')->group(function () {
+    Route::prefix('payroll')->name('payroll.')->middleware('can:payroll.view')->group(function () {
         Route::inertia('/employees', 'PlaceholderPage', [
             'title' => 'Salaried Employees (Monthly Sheets)',
             'moduleName' => 'Payroll',
@@ -106,45 +106,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'moduleName' => 'Reports',
             'targetPhase' => 'Phase 6 (Prompt 14)',
             'icon' => 'reports',
-        ])->name('sales');
+        ])->name('sales')->middleware('can:reports.sales');
 
         Route::inertia('/profit-loss', 'PlaceholderPage', [
             'title' => 'Profit & Loss Statement (Senior Accountant View)',
             'moduleName' => 'Reports',
             'targetPhase' => 'Phase 6 (Prompt 15)',
             'icon' => 'receipt',
-        ])->name('profit-loss');
-    });
-
-    // Settings Module Shell Placeholders
-    Route::prefix('settings')->name('settings.')->group(function () {
-        Route::inertia('/roles', 'PlaceholderPage', [
-            'title' => 'Users & Role Permission Matrix',
-            'moduleName' => 'Settings',
-            'targetPhase' => 'Phase 1 (Prompt 3)',
-            'icon' => 'shield',
-        ])->name('roles');
-
-        Route::inertia('/invoice', 'PlaceholderPage', [
-            'title' => 'Invoice Branding & Templates',
-            'moduleName' => 'Settings',
-            'targetPhase' => 'Phase 3 (Prompt 8)',
-            'icon' => 'printer',
-        ])->name('invoice');
-
-        Route::inertia('/pathao', 'PlaceholderPage', [
-            'title' => 'Pathao Courier Integration Settings',
-            'moduleName' => 'Settings',
-            'targetPhase' => 'Phase 4 (Prompt 9)',
-            'icon' => 'courier',
-        ])->name('pathao');
-
-        Route::inertia('/general', 'PlaceholderPage', [
-            'title' => 'General Shop Information & Categories',
-            'moduleName' => 'Settings',
-            'targetPhase' => 'Phase 1 (Prompt 3)',
-            'icon' => 'settings',
-        ])->name('general');
+        ])->name('profit-loss')->middleware('can:reports.profit_loss');
     });
 });
 

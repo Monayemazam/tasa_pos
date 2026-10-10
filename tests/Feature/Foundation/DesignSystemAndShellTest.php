@@ -25,7 +25,9 @@ test('authenticated user can visit dashboard with tasa shell', function () {
 });
 
 test('shell placeholder routes are defined and reachable for authenticated users', function () {
+    $this->seed(\Database\Seeders\RoleAndPermissionSeeder::class);
     $user = User::factory()->create();
+    $user->assignSingleRole('Owner');
 
     $routes = [
         'sales.create',

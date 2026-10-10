@@ -57,6 +57,12 @@ const handleLogout = () => {
     router.post('/logout');
 };
 
+const userPermissions = computed<string[]>(() => authUser.value?.permissions || []);
+const hasPermission = (perm: string) => {
+    if (userRole.value === 'Owner') return true;
+    return userPermissions.value.includes(perm);
+};
+
 const navGroups: NavGroup[] = [
     {
         title: 'Sales',
@@ -98,13 +104,49 @@ const navGroups: NavGroup[] = [
         title: 'Settings',
         icon: 'settings',
         items: [
-            { label: 'Users & Roles', href: '/settings/roles' },
+            { label: 'User Accounts', href: '/settings/users' },
+            { label: 'Roles & Permissions', href: '/settings/roles' },
+            { label: 'General & Categories', href: '/settings/general' },
             { label: 'Invoice Branding', href: '/settings/invoice' },
             { label: 'Pathao Courier', href: '/settings/pathao' },
-            { label: 'General Info', href: '/settings/general' },
+            { label: 'Audit Trail', href: '/settings/audit-logs' },
         ],
     },
 ];
+
+const filteredNavGroups = computed(() => {
+    return navGroups.map(group => {
+        if (group.title === 'Payroll' && !hasPermission('payroll.view')) {
+            return null;
+        }
+        if (group.title === 'Settings' && !hasPermission('settings.manage') && !hasPermission('users.manage') && !hasPermission('roles.manage')) {
+            return null;
+        }
+
+        const items = group.items.filter(item => {
+            if (item.href === '/reports/profit-loss' && !hasPermission('reports.profit_loss')) {
+                return false;
+            }
+            if (item.href === '/settings/users' && !hasPermission('users.manage')) {
+                return false;
+            }
+            if (item.href === '/settings/roles' && !hasPermission('roles.manage')) {
+                return false;
+            }
+            if ((item.href === '/settings/invoice' || item.href === '/settings/pathao' || item.href === '/settings/general' || item.href === '/settings/audit-logs') && !hasPermission('settings.manage')) {
+                return false;
+            }
+            return true;
+        });
+
+        if (items.length === 0) return null;
+
+        return {
+            ...group,
+            items,
+        };
+    }).filter(Boolean) as NavGroup[];
+});
 </script>
 
 <template>
@@ -148,7 +190,7 @@ const navGroups: NavGroup[] = [
                     </Link>
 
                     <!-- Nav Groups (Sales, Inventory, etc.) -->
-                    <div v-for="group in navGroups" :key="group.title" class="pt-1">
+                    <div v-for="group in filteredNavGroups" :key="group.title" class="pt-1">
                         <!-- Group Header Toggle -->
                         <button
                             type="button"
@@ -520,7 +562,7 @@ const navGroups: NavGroup[] = [
                         Dashboard
                     </Link>
 
-                    <div v-for="g in navGroups" :key="g.title" class="pt-2">
+                    <div v-for="g in filteredNavGroups" :key="g.title" class="pt-2">
                         <div class="px-3 text-xs font-bold text-ink-500 uppercase">{{ g.title }}</div>
                         <Link
                             v-for="sub in g.items"

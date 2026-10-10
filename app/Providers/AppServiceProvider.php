@@ -24,6 +24,30 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureAuthorization();
+    }
+
+    /**
+     * Configure authorization gates and locked role protection.
+     */
+    protected function configureAuthorization(): void
+    {
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Role::class, \App\Policies\RolePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Setting::class, \App\Policies\SettingPolicy::class);
+
+        \Illuminate\Support\Facades\Gate::before(function ($user, string $ability, array $arguments = []) {
+            if ($user instanceof \App\Models\User && $user->hasRole('Owner')) {
+                // If it is a mutation on a protected Role or User model, defer to explicit policy
+                $target = $arguments[0] ?? null;
+                if (($target instanceof \App\Models\Role || $target instanceof \App\Models\User)
+                    && in_array($ability, ['update', 'delete', 'deactivate'])) {
+                    return null;
+                }
+                return true;
+            }
+            return null;
+        });
     }
 
     /**

@@ -19,7 +19,13 @@ class SecurityController extends Controller
     {
         $props = [
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
+            'canManageTwoFactor' => $request->canManageTwoFactor(),
         ];
+
+        if ($request->canManageTwoFactor()) {
+            $props['twoFactorEnabled'] = $request->hasEnabledTwoFactor();
+            $props['requiresConfirmation'] = $request->requiresConfirmation();
+        }
 
         return Inertia::render('settings/Security', $props);
     }

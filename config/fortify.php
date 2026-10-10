@@ -143,9 +143,13 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Public registration removed; only Owner-authorized user creation
         Features::resetPasswords(),
         Features::emailVerification(),
+        Features::twoFactorAuthentication([
+            'confirm' => true,
+            'confirmPassword' => true,
+        ]),
     ],
 
 ];
