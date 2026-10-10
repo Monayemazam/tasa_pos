@@ -1,0 +1,191 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'lineicons/dist/lineicons.css';
+@plugin 'daisyui';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.vue';
+
+@theme {
+    --font-sans: 'Hanken Grotesk', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
+
+    /* Brand Teal Tokens */
+    --color-teal-50: #F0F7F5;
+    --color-teal-100: #E6F2EF;
+    --color-teal-200: #BFDDD6;
+    --color-teal-700: #0B6E5E;
+    --color-teal-800: #095A4C;
+    --color-teal-900: #074538;
+
+    /* Primary Semantic Tokens */
+    --color-primary: #0B6E5E;
+    --color-primary-hover: #095A4C;
+    --color-primary-active: #074538;
+    --color-primary-foreground: #FFFFFF;
+
+    /* Ink (Text) Tokens */
+    --color-ink-900: #0F1B1A;
+    --color-ink-700: #2B3A38;
+    --color-ink-600: #4A5957;
+    --color-ink-500: #5F6F6D;
+
+    /* Line (Borders & Dividers) Tokens */
+    --color-line-200: #D5DCDB;
+    --color-line-300: #B9C4C2;
+    --color-line-400: #7F8E8C;
+
+    /* Surface Tokens */
+    --color-surface: #FFFFFF;
+    --color-page: #F4F6F6;
+    --color-sunken: #EBEFEE;
+
+    /* Status Tokens */
+    --color-success: #1B7F3B;
+    --color-success-text: #14602C;
+    --color-success-bg: #E7F4EA;
+
+    --color-warning: #B26A00;
+    --color-warning-text: #8A5A00;
+    --color-warning-bg: #FFF4DB;
+
+    --color-danger: #B42318;
+    --color-danger-text: #8E1B12;
+    --color-danger-bg: #FDECEA;
+
+    --color-info: #1D5FA8;
+    --color-info-text: #174B85;
+    --color-info-bg: #E8F0FA;
+
+    --color-advance: #6B3FA0;
+    --color-advance-text: #55327F;
+    --color-advance-bg: #F1EAF8;
+
+    /* Reka UI / Starter Kit compatibility tokens mapped to strict Tasa design system */
+    --color-background: var(--color-page);
+    --color-foreground: var(--color-ink-900);
+    --color-card: var(--color-surface);
+    --color-card-foreground: var(--color-ink-900);
+    --color-popover: var(--color-surface);
+    --color-popover-foreground: var(--color-ink-900);
+    --color-secondary: var(--color-sunken);
+    --color-secondary-foreground: var(--color-ink-900);
+    --color-muted: var(--color-sunken);
+    --color-muted-foreground: var(--color-ink-600);
+    --color-accent: var(--color-teal-50);
+    --color-accent-foreground: var(--color-teal-700);
+    --color-destructive: var(--color-danger);
+    --color-destructive-foreground: #FFFFFF;
+    --color-border: var(--color-line-200);
+    --color-input: var(--color-line-400);
+    --color-ring: var(--color-teal-700);
+
+    /* Absolute Square Corners - Remove all default rounding */
+    --radius: 0px;
+    --radius-none: 0px;
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+    --radius-xl: 0px;
+    --radius-2xl: 0px;
+    --radius-3xl: 0px;
+}
+
+/* Enforce light-only color scheme globally */
+:root {
+    color-scheme: light;
+}
+
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: #D5DCDB;
+        border-radius: 0px !important;
+    }
+
+    /* Exceptions for radio buttons and spinners per UX guideline §2 */
+    input[type="radio"],
+    .spinner,
+    .animate-spin {
+        border-radius: 9999px !important;
+    }
+
+    html {
+        color-scheme: light;
+        font-family: 'Hanken Grotesk', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+        background-color: #F4F6F6;
+        color: #2B3A38;
+        font-variant-numeric: tabular-nums;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* 2px solid teal focus ring with 2px offset (WCAG AA accessibility requirement) */
+    :focus-visible {
+        outline: 2px solid #0B6E5E !important;
+        outline-offset: 2px !important;
+    }
+}
+
+/* Tabular figures utility for money and numbers */
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Screen reader only utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* Skip to content link */
+.skip-to-content {
+    position: absolute;
+    top: -9999px;
+    left: 1rem;
+    z-index: 9999;
+    padding: 0.5rem 1rem;
+    background-color: #0B6E5E;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+.skip-to-content:focus {
+    top: 1rem;
+}
+
+/* Motion reduction compliance */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
