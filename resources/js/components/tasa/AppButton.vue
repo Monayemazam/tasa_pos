@@ -48,13 +48,12 @@ const variantClasses = computed(() => {
 const sizeClasses = computed(() => {
     switch (props.size) {
         case 'sm':
-            return 'h-[32px] px-3 text-xs';
+            return 'h-[36px] sm:h-[32px] px-3 text-xs';
         case 'lg':
             return 'h-[48px] px-5 text-base';
         case 'md':
         default:
-            // Desktop 40px, mobile 48px touch friendly
-            return 'h-[40px] md:h-[40px] px-4 text-sm';
+            return 'h-[44px] sm:h-[40px] px-4 text-sm';
     }
 });
 </script>

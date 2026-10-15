@@ -10,7 +10,7 @@ use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('settings', fn() => redirect('/settings/profile'));
+    Route::get('settings', fn () => redirect('/settings/profile'));
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -67,6 +67,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('settings/pathao')->group(function () {
         Route::get('/', [SystemSettingController::class, 'pathao'])->name('settings.pathao');
         Route::post('/', [SystemSettingController::class, 'updatePathao'])->name('settings.pathao.update');
+        Route::get('/test-connection', [SystemSettingController::class, 'testPathaoConnection'])->name('settings.pathao.test-connection');
+        Route::post('/stores', [SystemSettingController::class, 'createPathaoStore'])->name('settings.pathao.stores.store');
     });
 
     // Audit Logs (Strictly Read-Only, Never Expose Update/Delete Routes)

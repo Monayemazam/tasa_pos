@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
-import TasaShell from '@/components/tasa/TasaShell.vue';
 import PageHeader from '@/components/tasa/PageHeader.vue';
 import AppButton from '@/components/tasa/AppButton.vue';
 import AppIcon from '@/components/tasa/AppIcon.vue';
@@ -11,6 +10,7 @@ import PhoneInput from '@/components/tasa/PhoneInput.vue';
 import ConfirmDialog from '@/components/tasa/ConfirmDialog.vue';
 import TablePagination from '@/components/tasa/TablePagination.vue';
 import EmptyState from '@/components/tasa/EmptyState.vue';
+import { showToast } from '@/lib/toast';
 
 interface RoleOption {
     id: number;
@@ -96,6 +96,11 @@ const submitCreate = () => {
         onSuccess: () => {
             isCreateOpen.value = false;
             createForm.reset();
+            showToast('User created successfully.', 'success');
+        },
+        onError: (errs) => {
+            const firstErr = (Object.values(errs)[0] as string) || 'Failed to create user.';
+            showToast(firstErr, 'danger');
         },
     });
 };
@@ -129,6 +134,11 @@ const submitEdit = () => {
         onSuccess: () => {
             isEditOpen.value = false;
             editingUser.value = null;
+            showToast('User updated successfully.', 'success');
+        },
+        onError: (errs) => {
+            const firstErr = (Object.values(errs)[0] as string) || 'Failed to update user.';
+            showToast(firstErr, 'danger');
         },
     });
 };
@@ -153,6 +163,11 @@ const submitReset = () => {
         onSuccess: () => {
             isResetOpen.value = false;
             resettingUser.value = null;
+            showToast('Password reset successfully.', 'success');
+        },
+        onError: (errs) => {
+            const firstErr = (Object.values(errs)[0] as string) || 'Failed to reset password.';
+            showToast(firstErr, 'danger');
         },
     });
 };
@@ -160,7 +175,12 @@ const submitReset = () => {
 // Toggle Active State
 const toggleUserActive = (user: UserItem) => {
     if (user.is_owner) return;
-    router.post(`/settings/users/${user.id}/toggle-active`, {}, { preserveScroll: true });
+    router.post(`/settings/users/${user.id}/toggle-active`, {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showToast(`User status updated.`, 'success');
+        },
+    });
 };
 
 // Delete User Confirm Dialog State
@@ -178,6 +198,11 @@ const confirmDelete = () => {
         onSuccess: () => {
             isDeleteOpen.value = false;
             deletingUser.value = null;
+            showToast('User deleted successfully.', 'success');
+        },
+        onError: (errs) => {
+            const firstErr = (Object.values(errs)[0] as string) || 'Failed to delete user.';
+            showToast(firstErr, 'danger');
         },
     });
 };
@@ -186,7 +211,7 @@ const confirmDelete = () => {
 <template>
     <Head title="User Accounts — Tasa POS" />
 
-    <TasaShell>
+    <div>
         <div class="space-y-6">
             <!-- Header -->
             <PageHeader
@@ -625,5 +650,5 @@ const confirmDelete = () => {
             @confirm="confirmDelete"
             @cancel="isDeleteOpen = false"
         />
-    </TasaShell>
+    </div>
 </template>

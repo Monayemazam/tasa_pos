@@ -16,8 +16,11 @@ class SaleItem extends Model
     protected $fillable = [
         'sale_id',
         'product_id',
+        'product_variant_id',
         'is_custom',
         'name',
+        'variant_name',
+        'variant_sku',
         'qty',
         'unit_price',
         'unit_cost',
@@ -45,6 +48,11 @@ class SaleItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 
     public function returnItems(): HasMany

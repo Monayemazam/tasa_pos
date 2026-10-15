@@ -11,12 +11,30 @@ class ExpenseCategory extends Model
 {
     use HasFactory;
 
+    public const PL_GROUPS = [
+        'marketing_facebook' => 'Facebook Ads',
+        'marketing_other' => 'Other Marketing',
+        'courier' => 'Courier Charges',
+        'packaging' => 'Packaging',
+        'rent_utilities' => 'Rent & Utilities',
+        'other' => 'Other Expenses',
+    ];
+
     protected $fillable = [
         'name',
         'pl_group',
         'is_system',
         'is_active',
     ];
+
+    protected $appends = [
+        'pl_group_label',
+    ];
+
+    public function getPlGroupLabelAttribute(): string
+    {
+        return self::PL_GROUPS[$this->pl_group] ?? ucfirst(str_replace('_', ' ', $this->pl_group));
+    }
 
     protected function casts(): array
     {

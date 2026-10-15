@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ProtectSensitiveFinancials;
 use App\Models\AuditLog;
 use App\Models\Role;
 use App\Models\Setting;
@@ -190,7 +191,7 @@ test('role permission changes take effect on the next request', function () {
 });
 
 test('sensitive financial columns are redacted for staff but visible to owner', function () {
-    $middleware = new \App\Http\Middleware\ProtectSensitiveFinancials();
+    $middleware = new ProtectSensitiveFinancials;
 
     $staff = User::factory()->create();
     $staff->assignSingleRole('Staff');

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
-import TasaShell from '@/components/tasa/TasaShell.vue';
 import PageHeader from '@/components/tasa/PageHeader.vue';
 import AppButton from '@/components/tasa/AppButton.vue';
 import AppIcon from '@/components/tasa/AppIcon.vue';
 import FormField from '@/components/tasa/FormField.vue';
 import ConfirmDialog from '@/components/tasa/ConfirmDialog.vue';
+import { showToast } from '@/lib/toast';
 
 interface RoleItem {
     id: number;
@@ -114,6 +114,18 @@ const discardChanges = () => {
     selectedPermissions.value = [...activeRole.value.permissions];
 };
 
+// Watch for server updates to props.roles and synchronize working state
+watch(
+    () => props.roles,
+    (newRoles) => {
+        const found = newRoles.find(r => r.id === activeRoleId.value);
+        if (found) {
+            selectedPermissions.value = [...found.permissions];
+        }
+    },
+    { deep: true }
+);
+
 // Save Permissions Form
 const isSaving = ref(false);
 const savePermissions = () => {
@@ -125,6 +137,17 @@ const savePermissions = () => {
         permissions: selectedPermissions.value,
     }, {
         preserveScroll: true,
+        onSuccess: (page) => {
+            const found = (page.props.roles as RoleItem[])?.find(r => r.id === activeRoleId.value);
+            if (found) {
+                selectedPermissions.value = [...found.permissions];
+            }
+            showToast(`Permissions for '${activeRole.value.name}' updated successfully.`, 'success');
+        },
+        onError: (errors) => {
+            const firstErr = (Object.values(errors)[0] as string) || 'Failed to update role permissions.';
+            showToast(firstErr, 'danger');
+        },
         onFinish: () => {
             isSaving.value = false;
         },
@@ -157,6 +180,11 @@ const submitCreateRole = () => {
         onSuccess: () => {
             isCreateOpen.value = false;
             createRoleForm.reset();
+            showToast('Role created successfully.', 'success');
+        },
+        onError: (errors) => {
+            const firstErr = (Object.values(errors)[0] as string) || 'Failed to create role. Please check validation.';
+            showToast(firstErr, 'danger');
         },
     });
 };
@@ -181,6 +209,11 @@ const confirmDeleteRole = () => {
                 activeRoleId.value = props.roles[0]?.id || 1;
                 selectedPermissions.value = [...(props.roles[0]?.permissions || [])];
             }
+            showToast('Role deleted successfully.', 'success');
+        },
+        onError: (errs) => {
+            const msg = (Object.values(errs)[0] as string) || 'Cannot delete role.';
+            showToast(msg, 'danger');
         },
     });
 };
@@ -189,7 +222,7 @@ const confirmDeleteRole = () => {
 <template>
     <Head title="Roles & Permissions — Tasa POS" />
 
-    <TasaShell>
+    <div>
         <div class="space-y-6 pb-24">
             <!-- Header -->
             <PageHeader
@@ -601,5 +634,5 @@ const confirmDeleteRole = () => {
             @confirm="confirmDeleteRole"
             @cancel="isDeleteOpen = false"
         />
-    </TasaShell>
+    </div>
 </template>

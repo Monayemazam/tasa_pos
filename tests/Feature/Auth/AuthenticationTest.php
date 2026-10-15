@@ -75,3 +75,29 @@ test('users are rate limited', function () {
 
     $response->assertTooManyRequests();
 });
+
+test('root URL renders TASA POS sign-in for unauthenticated guests', function () {
+    $response = $this->get(route('home'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Welcome')
+        ->has('canResetPassword')
+    );
+});
+
+test('root URL redirects authenticated users to dashboard', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('home'));
+
+    $response->assertRedirect(route('dashboard'));
+});
+
+test('authenticated user visiting login is redirected to dashboard', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('login'));
+
+    $response->assertRedirect(route('dashboard'));
+});

@@ -39,7 +39,7 @@ class UserPolicy
             return false;
         }
 
-        return $user->can('users.manage') || $user->id === $model->id;
+        return $user->can('users.manage');
     }
 
     /**

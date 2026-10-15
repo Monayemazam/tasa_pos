@@ -64,6 +64,7 @@ class RoleAndPermissionSeeder extends Seeder
 
             // Cost visibility
             'inventory.view_costs',
+            'inventory.cost.view',
 
             // Expenses
             'expenses.view',

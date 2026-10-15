@@ -15,9 +15,15 @@ class ProtectSensitiveFinancials
     protected array $costKeys = [
         'cost_price',
         'unit_cost',
+        'rate',
         'purchase_rate',
+        'rate_per_sqft',
+        'total_cost',
+        'avg_cost',
         'weighted_average_cost',
         'stock_value',
+        'period_purchased_cost',
+        'total_stock_value',
     ];
 
     /**
@@ -50,7 +56,7 @@ class ProtectSensitiveFinancials
             return $response;
         }
 
-        $canViewCosts = $user->can('inventory.view_costs');
+        $canViewCosts = $user->can('inventory.view_costs') || $user->can('inventory.cost.view');
         $canViewProfit = $user->can('reports.sales_profit');
 
         if ($canViewCosts && $canViewProfit) {
@@ -76,6 +82,7 @@ class ProtectSensitiveFinancials
                 $sanitized = $this->stripKeysRecursively($data, $keysToRemove);
                 $response->setData($sanitized);
             }
+
             return $response;
         }
 
@@ -87,6 +94,7 @@ class ProtectSensitiveFinancials
                 $sanitized = $this->stripKeysRecursively($data, $keysToRemove);
                 $response->setContent(json_encode($sanitized));
             }
+
             return $response;
         }
 

@@ -19,7 +19,7 @@ class InitialOwnerSeeder extends Seeder
         // Check if an Owner already exists
         $hasOwner = User::role('Owner')->exists();
 
-        if (!$hasOwner) {
+        if (! $hasOwner) {
             $email = env('INITIAL_OWNER_EMAIL', 'owner@tasa.com');
             $name = env('INITIAL_OWNER_NAME', 'Tasa Owner');
             $password = env('INITIAL_OWNER_PASSWORD', 'Tasa@Owner2026!');

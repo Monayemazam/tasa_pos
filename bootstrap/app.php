@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\ProtectSensitiveFinancials;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,12 +23,27 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
-            \App\Http\Middleware\EnsureUserIsActive::class,
-            \App\Http\Middleware\ProtectSensitiveFinancials::class,
+            EnsureUserIsActive::class,
+            ProtectSensitiveFinancials::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $e, Request $request) {
+            if (! $request->expectsJson() && ! $request->is('api/*')) {
+                if ($response->getStatusCode() === 403) {
+                    return inertia('Error', [
+                        'status' => 403,
+                        'message' => $e->getMessage() ?: 'This action or section is unauthorized for your role.',
+                    ])
+                    ->toResponse($request)
+                    ->setStatusCode(403);
+                }
+            }
+
+            return $response;
+        });
     })->create();

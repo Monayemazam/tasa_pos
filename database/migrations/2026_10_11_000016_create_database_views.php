@@ -64,7 +64,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP VIEW IF EXISTS v_accessory_stock;");
-        DB::statement("DROP VIEW IF EXISTS v_leather_stock;");
+        DB::statement('DROP VIEW IF EXISTS v_accessory_stock;');
+        DB::statement('DROP VIEW IF EXISTS v_leather_stock;');
     }
 };

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
-import TasaShell from '@/components/tasa/TasaShell.vue';
 import PageHeader from '@/components/tasa/PageHeader.vue';
 import AppButton from '@/components/tasa/AppButton.vue';
 import AppIcon from '@/components/tasa/AppIcon.vue';
@@ -41,16 +40,32 @@ const props = defineProps<{
 }>();
 
 // Settings Form
+const logoPreview = ref<string | null>(props.settings.logo || null);
+
 const form = useForm({
     shop_name: props.settings.shop_name,
     address: props.settings.address,
     phone: props.settings.phone,
     currency_symbol: props.settings.currency_symbol,
+    logo_file: null as File | null,
     allow_negative_stock: props.settings.allow_negative_stock,
     cost_price_includes_labour: props.settings.cost_price_includes_labour,
     allow_price_edit: props.settings.allow_price_edit,
     show_success_rate: props.settings.show_success_rate,
 });
+
+function handleLogoChange(e: Event) {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+        form.logo_file = file;
+        const reader = new FileReader();
+        reader.onload = (re) => {
+            logoPreview.value = re.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+}
 
 const submitSettings = () => {
     form.post('/settings/general', {
@@ -96,7 +111,7 @@ const confirmDeleteCategory = () => {
 <template>
     <Head title="General Settings & Categories — Tasa POS" />
 
-    <TasaShell>
+    <div>
         <div class="space-y-6 max-w-4xl">
             <!-- Header -->
             <PageHeader
@@ -148,6 +163,36 @@ const confirmDeleteCategory = () => {
                                 placeholder="Street, Market, City"
                             />
                         </FormField>
+
+                        <!-- Company / Shop Logo -->
+                        <div class="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 bg-page border border-line-200">
+                            <div class="w-28 h-16 bg-white border border-line-300 flex items-center justify-center p-1.5 flex-shrink-0 shadow-2xs">
+                                <img
+                                    v-if="logoPreview"
+                                    :src="logoPreview"
+                                    alt="Shop Logo"
+                                    class="max-h-full max-w-full object-contain"
+                                />
+                                <span v-else class="text-[10px] text-ink-400 text-center">No Logo</span>
+                            </div>
+                            <div class="flex-1 space-y-1">
+                                <label class="block text-xs font-bold text-ink-900">
+                                    Company / Shop Logo
+                                </label>
+                                <p class="text-[11px] text-ink-500">
+                                    Displayed dynamically on the sidebar, login screen, invoices, and reports across the web app.
+                                </p>
+                                <input
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                                    class="text-xs text-ink-700 file:mr-3 file:py-1 file:px-2.5 file:border file:border-line-300 file:text-xs file:font-semibold file:bg-surface hover:file:bg-teal-50 file:cursor-pointer"
+                                    @change="handleLogoChange"
+                                />
+                                <div v-if="form.errors.logo_file" class="text-xs text-danger font-medium mt-1">
+                                    {{ form.errors.logo_file }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -309,5 +354,5 @@ const confirmDeleteCategory = () => {
             @confirm="confirmDeleteCategory"
             @cancel="isDeleteCategoryOpen = false"
         />
-    </TasaShell>
+    </div>
 </template>

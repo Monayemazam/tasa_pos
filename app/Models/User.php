@@ -72,6 +72,29 @@ class User extends Authenticatable implements MustVerifyEmail
     public function assignSingleRole(string|Role $role): static
     {
         $this->syncRoles([$role]);
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        return $this;
+    }
+
+    /**
+     * Revoke permission from the user and their assigned roles, and forget permission cache.
+     */
+    public function revokePermissionTo($permission): static
+    {
+        $permObj = $this->getStoredPermission($permission);
+
+        foreach ($this->roles as $role) {
+            if ($role->hasPermissionTo($permObj)) {
+                $role->revokePermissionTo($permObj);
+            }
+        }
+
+        $this->permissions()->detach($permObj);
+        $this->forgetCachedPermissions();
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->load('roles', 'permissions');
+
         return $this;
     }
 

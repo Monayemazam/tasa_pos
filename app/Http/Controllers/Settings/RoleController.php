@@ -126,8 +126,8 @@ class RoleController extends Controller
         'Settings & Administration' => [
             'description' => 'Shop info, invoice branding, roles, and audit trail',
             'permissions' => [
+                'view' => 'settings.manage',
                 'special' => [
-                    ['key' => 'settings.manage', 'label' => 'Manage Shop & Courier Settings'],
                     ['key' => 'users.manage', 'label' => 'Manage User Accounts'],
                     ['key' => 'roles.manage', 'label' => 'Manage Roles & Permissions'],
                 ],
@@ -219,7 +219,7 @@ class RoleController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:50', 'unique:roles,name,' . $role->id],
+            'name' => ['required', 'string', 'max:50', 'unique:roles,name,'.$role->id],
             'description' => ['nullable', 'string', 'max:255'],
             'permissions' => ['required', 'array'],
             'permissions.*' => ['string', 'exists:permissions,name'],

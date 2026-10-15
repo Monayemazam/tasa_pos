@@ -57,9 +57,38 @@ class Sale extends Model
             'delivery_charge' => 'decimal:2',
             'grand_total' => 'decimal:2',
             'paid_total' => 'decimal:2',
-            'due_amount' => 'decimal:2',
             'cancelled_at' => 'datetime',
         ];
+    }
+
+    protected function dueAmount(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn ($value) => $value !== null
+                ? (float) $value
+                : round((float) ($this->attributes['grand_total'] ?? 0) - (float) ($this->attributes['paid_total'] ?? 0), 2)
+        );
+    }
+
+    protected function netDueAmount(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: function () {
+                if ($this->status === 'cancelled') {
+                    return 0.00;
+                }
+
+                $rawDue = (float) $this->due_amount;
+                $unrefundedReturn = 0.00;
+                if ($this->relationLoaded('returns')) {
+                    $unrefundedReturn = (float) $this->returns->sum(fn ($r) => (float) $r->return_value - (float) $r->refunded_amount);
+                } else {
+                    $unrefundedReturn = (float) $this->returns()->sum(\Illuminate\Support\Facades\DB::raw('return_value - refunded_amount'));
+                }
+
+                return round(max(0, $rawDue - $unrefundedReturn), 2);
+            }
+        );
     }
 
     public function customer(): BelongsTo

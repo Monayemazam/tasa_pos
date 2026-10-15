@@ -51,7 +51,21 @@ export type IconConcept =
     | 'more'
     | 'logout'
     | 'box'
-    | 'refresh';
+    | 'refresh'
+    | 'alert-circle'
+    | 'database'
+    | 'archive'
+    | 'user-check'
+    | 'file-text'
+    | 'clock'
+    | 'external-link'
+    | 'x'
+    | 'alert-triangle'
+    | 'eye'
+    | 'history'
+    | 'arrow-left'
+    | 'table'
+    | 'bar-chart';
 
 export const ICON_CLASS_MAP: Record<IconConcept, string> = {
     box: 'lni lni-box-archive-1',
@@ -101,6 +115,20 @@ export const ICON_CLASS_MAP: Record<IconConcept, string> = {
     menu: 'lni lni-chevron-down',
     more: 'lni lni-chevron-down-circle',
     logout: 'lni lni-exit',
+    'alert-circle': 'lni lni-warning',
+    database: 'lni lni-database-2',
+    archive: 'lni lni-box-archive-1',
+    'user-check': 'lni lni-user-4',
+    'file-text': 'lni lni-document',
+    clock: 'lni lni-timer-1',
+    'external-link': 'lni lni-arrow-up-right',
+    x: 'lni lni-xmark',
+    'alert-triangle': 'lni lni-warning',
+    eye: 'lni lni-eye',
+    history: 'lni lni-timer-1',
+    'arrow-left': 'lni lni-chevron-left',
+    table: 'lni lni-grid-alt',
+    'bar-chart': 'lni lni-bar-chart-4',
 };
 
 /**

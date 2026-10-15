@@ -9,7 +9,6 @@ use App\Services\AuditService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -90,6 +89,10 @@ class UserController extends Controller
             'role' => ['required', 'string', 'exists:roles,name'],
         ]);
 
+        if ($validated['role'] === 'Owner' && ! $request->user()->hasRole('Owner')) {
+            abort(403, 'Only owners can assign the Owner role.');
+        }
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -141,7 +144,17 @@ class UserController extends Controller
             }
         }
 
+        // Prevent non-owners from escalating to Owner role
+        if ($validated['role'] === 'Owner' && ! $request->user()->hasRole('Owner')) {
+            abort(403, 'Only owners can assign the Owner role.');
+        }
+
         $oldRole = $user->roles->first()?->name;
+
+        // Prevent staff from changing their own role
+        if ($user->id === $request->user()->id && $validated['role'] !== $oldRole && ! $request->user()->hasRole('Owner')) {
+            abort(403, 'You cannot change your own role.');
+        }
         $oldValues = [
             'name' => $user->name,
             'email' => $user->email,
@@ -201,6 +214,7 @@ class UserController extends Controller
         );
 
         $statusLabel = $newStatus ? 'activated' : 'deactivated';
+
         return back()->with('success', "User '{$user->name}' has been {$statusLabel}.");
     }
 

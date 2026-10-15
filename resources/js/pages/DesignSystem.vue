@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import AppLayout from '@/layouts/AppLayout.vue';
 import PageHeader from '@/components/tasa/PageHeader.vue';
 import AppButton from '@/components/tasa/AppButton.vue';
 import FormField from '@/components/tasa/FormField.vue';
@@ -77,7 +76,7 @@ const handleTriggerToast = (tone: any) => {
 </script>
 
 <template>
-    <AppLayout>
+    <div class="space-y-6">
         <!-- Page Header -->
         <PageHeader
             title="Tasa POS Design System & UX Specimen"
@@ -347,5 +346,5 @@ const handleTriggerToast = (tone: any) => {
                 <AppButton variant="primary" @click="isDrawerOpen = false; handleTriggerToast('success')">Save Purchase</AppButton>
             </template>
         </SideDrawer>
-    </AppLayout>
+    </div>
 </template>

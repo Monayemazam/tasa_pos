@@ -32,6 +32,22 @@ class SalaryMonth extends Model
         ];
     }
 
+    /**
+     * Get computed payable attribute as float.
+     */
+    public function getPayableAttribute($value): float
+    {
+        if ($value !== null) {
+            return (float) $value;
+        }
+
+        $base = (float) ($this->base_salary ?? 0);
+        $bonus = (float) ($this->bonus ?? 0);
+        $deduction = (float) ($this->deduction ?? 0);
+
+        return round($base + $bonus - $deduction, 2);
+    }
+
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);

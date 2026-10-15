@@ -20,7 +20,7 @@ class ExpenseCategorySeeder extends Seeder
             ['name' => 'Rent', 'pl_group' => 'rent_utilities', 'is_system' => false],
             ['name' => 'Electricity', 'pl_group' => 'rent_utilities', 'is_system' => false],
             ['name' => 'Internet', 'pl_group' => 'rent_utilities', 'is_system' => false],
-            ['name' => 'Gas / Water', 'pl_group' => 'rent_utilities', 'is_system' => false],
+            ['name' => 'Gas/Water', 'pl_group' => 'rent_utilities', 'is_system' => false],
             ['name' => 'Transport', 'pl_group' => 'other', 'is_system' => false],
             ['name' => 'Repair & Maintenance', 'pl_group' => 'other', 'is_system' => false],
             ['name' => 'Tools & Equipment', 'pl_group' => 'other', 'is_system' => false],

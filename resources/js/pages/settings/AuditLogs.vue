@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
-import TasaShell from '@/components/tasa/TasaShell.vue';
 import PageHeader from '@/components/tasa/PageHeader.vue';
 import AppButton from '@/components/tasa/AppButton.vue';
 import AppIcon from '@/components/tasa/AppIcon.vue';
@@ -98,7 +97,6 @@ const inspectPayload = (log: AuditLogItem) => {
 <template>
     <Head title="Audit Trail Logs — Tasa POS" />
 
-    <TasaShell>
         <div class="space-y-6">
             <!-- Header -->
             <PageHeader
@@ -310,6 +308,5 @@ const inspectPayload = (log: AuditLogItem) => {
                     </AppButton>
                 </div>
             </div>
-        </div>
-    </TasaShell>
+    </div>
 </template>

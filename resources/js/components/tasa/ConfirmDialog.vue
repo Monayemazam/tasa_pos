@@ -1,28 +1,40 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import AppButton from './AppButton.vue';
 import FormField from './FormField.vue';
 
 interface Props {
-    open: boolean;
+    open?: boolean;
+    isOpen?: boolean;
     title: string;
-    description: string;
+    description?: string;
+    message?: string;
     confirmLabel?: string;
     cancelLabel?: string;
     requireReason?: boolean;
     reasonPlaceholder?: string;
     danger?: boolean;
+    tone?: 'danger' | 'neutral' | 'warning';
     loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    open: undefined,
+    isOpen: undefined,
+    description: '',
+    message: '',
     confirmLabel: 'Confirm',
     cancelLabel: 'Keep it',
     requireReason: false,
     reasonPlaceholder: 'Please state the reason for this action...',
-    danger: true,
+    danger: undefined,
+    tone: 'danger',
     loading: false,
 });
+
+const isVisible = computed(() => props.open ?? props.isOpen ?? false);
+const resolvedDescription = computed(() => props.description || props.message || '');
+const isDestructive = computed(() => props.danger ?? (props.tone === 'danger'));
 
 const emit = defineEmits<{
     (e: 'confirm', reason?: string): void;
@@ -31,16 +43,39 @@ const emit = defineEmits<{
 
 const reason = ref('');
 const reasonError = ref('');
+const cancelBtnRef = ref<any>(null);
+const reasonInputRef = ref<HTMLTextAreaElement | null>(null);
 
 watch(
-    () => props.open,
+    isVisible,
     (isOpen) => {
         if (isOpen) {
             reason.value = '';
             reasonError.value = '';
+            nextTick(() => {
+                if (props.requireReason && reasonInputRef.value) {
+                    reasonInputRef.value.focus();
+                } else if (cancelBtnRef.value?.$el) {
+                    cancelBtnRef.value.$el.focus();
+                }
+            });
         }
     }
 );
+
+const onKeydown = (e: KeyboardEvent) => {
+    if (isVisible.value && e.key === 'Escape') {
+        emit('cancel');
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('keydown', onKeydown);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', onKeydown);
+});
 
 const handleConfirm = () => {
     if (props.requireReason && !reason.value.trim()) {
@@ -53,7 +88,7 @@ const handleConfirm = () => {
 
 <template>
     <div
-        v-if="open"
+        v-if="isVisible"
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
         role="dialog"
         aria-modal="true"
@@ -74,7 +109,7 @@ const handleConfirm = () => {
             </h2>
 
             <p class="text-sm text-ink-600 mb-4 leading-relaxed">
-                {{ description }}
+                {{ resolvedDescription }}
             </p>
 
             <!-- Mandatory reason field if required -->
@@ -87,6 +122,7 @@ const handleConfirm = () => {
                 >
                     <textarea
                         id="dialog-reason"
+                        ref="reasonInputRef"
                         v-model="reason"
                         rows="2"
                         :placeholder="reasonPlaceholder"
@@ -95,9 +131,10 @@ const handleConfirm = () => {
                 </FormField>
             </div>
 
-            <!-- Action buttons: Secondary on left, Danger/Primary on right -->
+            <!-- Action buttons: Secondary on left (auto-focused), Destructive/Primary on right (NEVER auto-focused) -->
             <div class="flex items-center justify-end space-x-3 mt-6">
                 <AppButton
+                    ref="cancelBtnRef"
                     variant="secondary"
                     :disabled="loading"
                     @click="emit('cancel')"
@@ -106,7 +143,7 @@ const handleConfirm = () => {
                 </AppButton>
 
                 <AppButton
-                    :variant="danger ? 'danger' : 'primary'"
+                    :variant="isDestructive ? 'danger' : 'primary'"
                     :loading="loading"
                     @click="handleConfirm"
                 >

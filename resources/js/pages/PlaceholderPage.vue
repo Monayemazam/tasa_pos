@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
 import PageHeader from '@/components/tasa/PageHeader.vue';
 import EmptyState from '@/components/tasa/EmptyState.vue';
 import { type IconConcept } from '@/lib/icons';
@@ -17,7 +16,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <AppLayout>
+    <div class="space-y-6">
         <PageHeader
             :title="title"
             :subtitle="`Module: ${moduleName} · Scheduled for implementation in ${targetPhase}`"
@@ -30,5 +29,5 @@ withDefaults(defineProps<Props>(), {
                 :description="`This module screen has its navigation route and layout shell configured. The business logic, database migrations, and operational workflows are scheduled for ${targetPhase} per the Tasa POS roadmap.`"
             />
         </div>
-    </AppLayout>
+    </div>
 </template>

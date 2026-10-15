@@ -1,13 +1,19 @@
 <script setup lang="ts">
 interface Props {
-    title: string;
+    title?: string;
+    label?: string;
     value: string | number;
     subtext?: string;
+    hint?: string;
     isPrimary?: boolean;
     isNegative?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
+    title: '',
+    label: '',
+    subtext: '',
+    hint: '',
     isPrimary: false,
     isNegative: false,
 });
@@ -22,7 +28,7 @@ withDefaults(defineProps<Props>(), {
     >
         <!-- Overline Label -->
         <span class="text-xs uppercase font-semibold tracking-wider text-ink-600 mb-2">
-            {{ title }}
+            {{ title || label }}
         </span>
 
         <!-- Display Hero Number -->

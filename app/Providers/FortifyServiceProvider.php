@@ -4,12 +4,16 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User;
+use App\Services\AuditService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
@@ -43,27 +47,32 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::createUsersUsing(CreateNewUser::class);
 
         Fortify::authenticateUsing(function (Request $request) {
-            $user = \App\Models\User::where('email', $request->email)->first();
+            $inputEmail = trim(strtolower((string) $request->email));
+            $normalizedEmail = str_ends_with($inputEmail, '.bd') ? substr($inputEmail, 0, -3) : $inputEmail;
 
-            if ($user && \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
-                if (! $user->is_active) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        Fortify::username() => __('Your account has been deactivated. Please contact the administrator.'),
-                    ]);
+            $user = User::where('email', $inputEmail)
+                ->orWhere('email', $normalizedEmail)
+                ->first();
+
+            if ($user && Hash::check((string) $request->password, $user->password)) {
+                    if (! $user->is_active) {
+                        throw ValidationException::withMessages([
+                            Fortify::username() => __('Your account has been deactivated. Please contact the administrator.'),
+                        ]);
+                    }
+
+                    $user->update(['last_login_at' => now()]);
+
+                    AuditService::log(
+                        'login',
+                        $user,
+                        null,
+                        ['email' => $user->email, 'last_login_at' => now()->toDateTimeString()],
+                        $user->id
+                    );
+
+                    return $user;
                 }
-
-                $user->update(['last_login_at' => now()]);
-
-                \App\Services\AuditService::log(
-                    'login',
-                    $user,
-                    null,
-                    ['email' => $user->email, 'last_login_at' => now()->toDateTimeString()],
-                    $user->id
-                );
-
-                return $user;
-            }
 
             return null;
         });

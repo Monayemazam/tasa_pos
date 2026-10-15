@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RoleAndPermissionSeeder;
 
 test('design system preview route is accessible', function () {
     $response = $this->get(route('design'));
@@ -25,7 +26,7 @@ test('authenticated user can visit dashboard with tasa shell', function () {
 });
 
 test('shell placeholder routes are defined and reachable for authenticated users', function () {
-    $this->seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+    $this->seed(RoleAndPermissionSeeder::class);
     $user = User::factory()->create();
     $user->assignSingleRole('Owner');
 

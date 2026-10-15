@@ -28,11 +28,12 @@ class Setting extends Model
         }
 
         $setting = static::where('group', $group)->where('key', $key)->first();
-        if (!$setting || $setting->value === null) {
+        if (! $setting || $setting->value === null) {
             return $default;
         }
 
         $decoded = json_decode($setting->value, true);
+
         return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $setting->value;
     }
 

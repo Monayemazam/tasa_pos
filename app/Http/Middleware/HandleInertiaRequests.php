@@ -52,6 +52,14 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'courier_warning' => $user ? app(\App\Services\Courier\PathaoService::class)->getCourierWarning() : null,
+            'shop' => [
+                'name' => \App\Models\Setting::get('general.shop_name', 'Tasa Leather Goods'),
+                'logo' => \App\Models\Setting::get('general.logo', '/storage/branding/tasa-logo.png'),
+                'phone' => \App\Models\Setting::get('general.phone', ''),
+                'address' => \App\Models\Setting::get('general.address', ''),
+                'currency_symbol' => \App\Models\Setting::get('general.currency_symbol', '৳'),
+            ],
         ];
     }
 }

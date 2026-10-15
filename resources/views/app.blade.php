@@ -5,9 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="color-scheme" content="light">
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        @php
+            $shopLogo = \App\Models\Setting::get('general.logo', '/storage/branding/tasa-logo.png');
+        @endphp
+        <link rel="icon" type="image/png" href="{{ $shopLogo ?: '/favicon.png' }}">
+        <link rel="apple-touch-icon" href="{{ $shopLogo ?: '/apple-touch-icon.png' }}">
 
         {{-- Self-hosted fonts: Hanken Grotesk & Noto Sans Bengali --}}
         <link rel="stylesheet" href="/fonts/fonts.css">

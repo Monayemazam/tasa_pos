@@ -16,6 +16,7 @@ class StockAdjustment extends Model
     protected $fillable = [
         'item_type',
         'item_id',
+        'product_variant_id',
         'qty',
         'reason',
         'note',
@@ -41,6 +42,11 @@ class StockAdjustment extends Model
         static::deleting(function () {
             throw new RuntimeException('Stock adjustments are append-only and cannot be deleted.');
         });
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 
     public function creator(): BelongsTo

@@ -25,6 +25,10 @@ declare module '@inertiajs/core' {
     }
 }
 
+declare global {
+    function route(name?: string, params?: any): any;
+}
+
 declare module 'vue' {
     interface GlobalDirectives {
         vFocus: Directive<HTMLElement, boolean | undefined>;
@@ -34,5 +38,6 @@ declare module 'vue' {
         $inertia: typeof Router;
         $page: Page;
         $headManager: ReturnType<typeof createHeadManager>;
+        route: typeof route;
     }
 }

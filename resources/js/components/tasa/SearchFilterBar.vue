@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import AppIcon from './AppIcon.vue';
 import AppButton from './AppButton.vue';
 
-interface FilterChip {
+export interface FilterChip {
     key: string;
     label: string;
     value: string;
@@ -14,6 +14,7 @@ interface Props {
     modelValue?: string;
     activeFilters?: FilterChip[];
     showExport?: boolean;
+    mobileTitle?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
     modelValue: '',
     activeFilters: () => [],
     showExport: false,
+    mobileTitle: 'Filter Records',
 });
 
 const emit = defineEmits<{
@@ -28,9 +30,11 @@ const emit = defineEmits<{
     (e: 'remove-filter', key: string): void;
     (e: 'clear-all'): void;
     (e: 'export'): void;
+    (e: 'apply-mobile'): void;
 }>();
 
 const query = ref(props.modelValue);
+const isMobileFilterOpen = ref(false);
 let debounceTimer: any = null;
 
 watch(query, (val) => {
@@ -46,6 +50,11 @@ watch(
         query.value = val;
     }
 );
+
+const handleApplyMobile = () => {
+    isMobileFilterOpen.value = false;
+    emit('apply-mobile');
+};
 </script>
 
 <template>
@@ -74,8 +83,35 @@ watch(
                 </button>
             </div>
 
-            <!-- Filters, Date Picker & Export Slot -->
-            <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+            <!-- Mobile Filter Trigger Button (< 640px) -->
+            <div class="sm:hidden flex items-center gap-2">
+                <button
+                    type="button"
+                    class="flex-1 flex items-center justify-center gap-2 h-[40px] px-3 bg-surface border border-line-400 text-xs font-bold text-ink-800 hover:bg-teal-50"
+                    @click="isMobileFilterOpen = true"
+                >
+                    <AppIcon name="filter" :size="16" />
+                    <span>Filters</span>
+                    <span
+                        v-if="activeFilters.length > 0"
+                        class="px-1.5 py-0.5 bg-teal-700 text-white text-[10px] font-bold"
+                    >
+                        {{ activeFilters.length }}
+                    </span>
+                </button>
+
+                <AppButton
+                    v-if="showExport"
+                    variant="secondary"
+                    icon="download"
+                    @click="emit('export')"
+                >
+                    Export
+                </AppButton>
+            </div>
+
+            <!-- Desktop Filters, Date Picker & Export Slot (>= 640px) -->
+            <div class="hidden sm:flex flex-wrap items-center gap-2 sm:justify-end">
                 <slot name="filters" />
 
                 <AppButton
@@ -104,8 +140,8 @@ watch(
                 <span class="mr-1.5">{{ chip.label }}: <strong>{{ chip.value }}</strong></span>
                 <button
                     type="button"
-                    class="hover:text-teal-900 font-bold"
-                    aria-label="Remove filter"
+                    class="hover:text-teal-900 font-bold p-0.5"
+                    :aria-label="`Remove filter ${chip.label}`"
                     @click="emit('remove-filter', chip.key)"
                 >
                     <AppIcon name="close" :size="12" />
@@ -119,6 +155,63 @@ watch(
             >
                 Clear all
             </button>
+        </div>
+
+        <!-- FULL-SCREEN MOBILE FILTER SHEET (< 640px) -->
+        <div
+            v-if="isMobileFilterOpen"
+            class="sm:hidden fixed inset-0 z-50 bg-surface flex flex-col"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Filter Options"
+        >
+            <!-- Mobile Sticky Header -->
+            <div class="h-[56px] px-4 border-b border-line-200 flex items-center justify-between bg-surface sticky top-0 z-10">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-base font-bold text-ink-900">{{ mobileTitle }}</h2>
+                    <span
+                        v-if="activeFilters.length > 0"
+                        class="px-2 py-0.5 bg-teal-100 text-teal-800 text-xs font-bold"
+                    >
+                        {{ activeFilters.length }} active
+                    </span>
+                </div>
+                <button
+                    type="button"
+                    class="p-2 text-ink-700 hover:bg-teal-50"
+                    aria-label="Close filter sheet"
+                    @click="isMobileFilterOpen = false"
+                >
+                    <AppIcon name="close" :size="20" />
+                </button>
+            </div>
+
+            <!-- Scrollable Body with Filter Controls -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                <slot name="mobile-filters">
+                    <div class="space-y-4">
+                        <slot name="filters" />
+                    </div>
+                </slot>
+            </div>
+
+            <!-- Sticky Action Bar at Bottom -->
+            <div class="p-4 border-t border-line-200 bg-page flex items-center justify-between gap-3 sticky bottom-0 z-10">
+                <button
+                    type="button"
+                    class="text-xs text-ink-600 hover:text-danger underline font-semibold px-2 py-2"
+                    @click="emit('clear-all'); isMobileFilterOpen = false;"
+                >
+                    Reset all
+                </button>
+                <AppButton
+                    variant="primary"
+                    class="flex-1"
+                    @click="handleApplyMobile"
+                >
+                    Apply filters
+                </AppButton>
+            </div>
         </div>
     </div>
 </template>

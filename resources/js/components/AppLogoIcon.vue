@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue';
+import { computed, type HTMLAttributes } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 
 defineOptions({
     inheritAttrs: false,
@@ -7,13 +8,25 @@ defineOptions({
 
 type Props = {
     className?: HTMLAttributes['class'];
+    src?: string;
 };
 
-defineProps<Props>();
+const props = defineProps<Props>();
+const page = usePage();
+const shopLogo = computed(() => props.src || (page.props as any)?.shop?.logo || null);
 </script>
 
 <template>
+    <img
+        v-if="shopLogo"
+        :src="shopLogo"
+        :class="className"
+        v-bind="$attrs"
+        alt="Logo"
+        class="object-contain"
+    />
     <svg
+        v-else
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 40 42"
         :class="className"

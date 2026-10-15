@@ -38,6 +38,10 @@ class SalePayment extends Model
         static::updating(function () {
             throw new RuntimeException('Sale payments are append-only and cannot be updated.');
         });
+
+        static::deleting(function () {
+            throw new RuntimeException('Sale payments are append-only and cannot be deleted.');
+        });
     }
 
     public function sale(): BelongsTo

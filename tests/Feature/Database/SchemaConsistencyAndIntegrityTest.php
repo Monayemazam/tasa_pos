@@ -1,12 +1,8 @@
 <?php
 
-use App\Models\AccessoryConsumption;
-use App\Models\AccessoryItem;
-use App\Models\AccessoryPurchase;
 use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Employee;
-use App\Models\ExpenseCategory;
 use App\Models\InvoiceSequence;
 use App\Models\LeatherConsumption;
 use App\Models\LeatherItem;
@@ -17,13 +13,8 @@ use App\Models\ProductStockMovement;
 use App\Models\Role;
 use App\Models\SalaryMonth;
 use App\Models\Sale;
-use App\Models\SaleItem;
-use App\Models\SalePayment;
 use App\Models\Setting;
 use App\Models\User;
-use App\Models\Worker;
-use App\Models\WorkerEarning;
-use App\Models\WorkerPayment;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -111,11 +102,11 @@ test('audit logs and stock movements are append-only and cannot be mutated or de
         ->toThrow(RuntimeException::class, 'Audit logs are append-only and cannot be deleted.');
 
     // Test product movement append-only
-    $cat = ProductCategory::create(['name' => 'Wallets_' . Str::random(5)]);
+    $cat = ProductCategory::create(['name' => 'Wallets_'.Str::random(5)]);
     $prod = Product::create([
         'product_category_id' => $cat->id,
         'name' => 'Slim Wallet',
-        'sku' => 'SKU_' . Str::random(8),
+        'sku' => 'SKU_'.Str::random(8),
         'cost_price' => 500.00,
         'selling_price' => 1200.00,
         'stock_qty' => 10,
@@ -137,7 +128,7 @@ test('audit logs and stock movements are append-only and cannot be mutated or de
 });
 
 test('unique constraints on customer phone and product sku are enforced', function () {
-    $phone = '017' . rand(10000000, 99999999);
+    $phone = '017'.rand(10000000, 99999999);
     Customer::create([
         'name' => 'Customer A',
         'phone' => $phone,
@@ -152,8 +143,8 @@ test('unique constraints on customer phone and product sku are enforced', functi
         ]);
     })->toThrow(QueryException::class);
 
-    $cat = ProductCategory::create(['name' => 'Belts_' . Str::random(5)]);
-    $sku = 'BELT_' . Str::random(6);
+    $cat = ProductCategory::create(['name' => 'Belts_'.Str::random(5)]);
+    $sku = 'BELT_'.Str::random(6);
 
     Product::create([
         'product_category_id' => $cat->id,
@@ -177,12 +168,12 @@ test('unique constraints on customer phone and product sku are enforced', functi
 test('stored generated columns compute accurately for sales due_amount and salary_months payable', function () {
     $cust = Customer::create([
         'name' => 'Zubair Ahmed',
-        'phone' => '018' . rand(10000000, 99999999),
+        'phone' => '018'.rand(10000000, 99999999),
         'address' => 'House 4, Road 2, Dhanmondi, Dhaka',
     ]);
 
     $sale = Sale::create([
-        'invoice_no' => 'TASA-' . now()->format('ym') . '-' . rand(1000, 9999),
+        'invoice_no' => 'TASA-'.now()->format('ym').'-'.rand(1000, 9999),
         'idempotency_token' => (string) Str::uuid(),
         'customer_id' => $cust->id,
         'customer_name' => $cust->name,
@@ -226,12 +217,12 @@ test('stored generated columns compute accurately for sales due_amount and salar
 test('foreign key restrict prevents deleting records that have dependent child transactions', function () {
     $cust = Customer::create([
         'name' => 'Restricted Cust',
-        'phone' => '015' . rand(10000000, 99999999),
+        'phone' => '015'.rand(10000000, 99999999),
         'address' => 'Mirpur 10, Dhaka',
     ]);
 
     Sale::create([
-        'invoice_no' => 'TASA-' . now()->format('ym') . '-' . rand(1000, 9999),
+        'invoice_no' => 'TASA-'.now()->format('ym').'-'.rand(1000, 9999),
         'idempotency_token' => (string) Str::uuid(),
         'customer_id' => $cust->id,
         'customer_name' => $cust->name,

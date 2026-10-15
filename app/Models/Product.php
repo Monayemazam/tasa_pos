@@ -16,6 +16,8 @@ class Product extends Model
     protected $fillable = [
         'product_category_id',
         'name',
+        'has_variants',
+        'variation_type',
         'sku',
         'cost_price',
         'selling_price',
@@ -29,6 +31,7 @@ class Product extends Model
     protected function casts(): array
     {
         return [
+            'has_variants' => 'boolean',
             'cost_price' => 'decimal:2',
             'selling_price' => 'decimal:2',
             'stock_qty' => 'integer',
@@ -40,6 +43,16 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function activeVariants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->where('is_active', true);
     }
 
     public function movements(): HasMany

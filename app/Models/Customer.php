@@ -38,4 +38,36 @@ class Customer extends Model
     {
         return $this->hasMany(Sale::class);
     }
+
+    public function getTotalOrdersAttribute(): int
+    {
+        if (array_key_exists('sales_count', $this->attributes)) {
+            return (int) $this->attributes['sales_count'];
+        }
+
+        return (int) $this->sales()->where('status', '!=', 'cancelled')->count();
+    }
+
+    public function getTotalSpentAttribute(): float
+    {
+        if (array_key_exists('total_spent_amount', $this->attributes)) {
+            return (float) $this->attributes['total_spent_amount'];
+        }
+
+        return (float) $this->sales()->where('status', '!=', 'cancelled')->sum('grand_total');
+    }
+
+    public function getOutstandingDueAttribute(): float
+    {
+        if (array_key_exists('outstanding_due_amount', $this->attributes)) {
+            return (float) $this->attributes['outstanding_due_amount'];
+        }
+
+        $activeSales = $this->sales()
+            ->where('status', '!=', 'cancelled')
+            ->with('returns')
+            ->get();
+
+        return round($activeSales->sum(fn ($sale) => (float) $sale->net_due_amount), 2);
+    }
 }

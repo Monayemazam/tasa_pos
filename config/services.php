@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'pathao' => [
+        'base_url' => env('PATHAO_BASE_URL', env('PATHAO_SANDBOX', false) ? 'https://courier-api-sandbox.pathao.com' : 'https://api-hermes.pathao.com'),
+        'client_id' => env('PATHAO_CLIENT_ID'),
+        'client_secret' => env('PATHAO_CLIENT_SECRET'),
+        'secret_token' => env('PATHAO_SECRET_TOKEN'),
+        'username' => env('PATHAO_USERNAME'),
+        'password' => env('PATHAO_PASSWORD'),
+        'sandbox' => env('PATHAO_SANDBOX', false),
+    ],
+
 ];

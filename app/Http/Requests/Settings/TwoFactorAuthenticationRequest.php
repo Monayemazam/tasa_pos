@@ -4,6 +4,8 @@ namespace App\Http\Requests\Settings;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Laravel\Fortify\Features;
+use Laravel\Fortify\Fortify;
 use Laravel\Fortify\InteractsWithTwoFactorState;
 
 class TwoFactorAuthenticationRequest extends FormRequest
@@ -15,7 +17,7 @@ class TwoFactorAuthenticationRequest extends FormRequest
      */
     public function canManageTwoFactor(): bool
     {
-        return \Laravel\Fortify\Features::canManageTwoFactorAuthentication();
+        return Features::canManageTwoFactorAuthentication();
     }
 
     /**
@@ -24,7 +26,7 @@ class TwoFactorAuthenticationRequest extends FormRequest
     public function hasEnabledTwoFactor(): bool
     {
         return ! is_null($this->user()?->two_factor_secret) &&
-            (! \Laravel\Fortify\Fortify::confirmsTwoFactorAuthentication() || ! is_null($this->user()?->two_factor_confirmed_at));
+            (! Fortify::confirmsTwoFactorAuthentication() || ! is_null($this->user()?->two_factor_confirmed_at));
     }
 
     /**
@@ -32,7 +34,7 @@ class TwoFactorAuthenticationRequest extends FormRequest
      */
     public function requiresConfirmation(): bool
     {
-        return \Laravel\Fortify\Fortify::confirmsTwoFactorAuthentication() &&
+        return Fortify::confirmsTwoFactorAuthentication() &&
             is_null($this->user()?->two_factor_confirmed_at);
     }
 

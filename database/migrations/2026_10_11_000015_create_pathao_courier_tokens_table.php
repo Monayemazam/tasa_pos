@@ -13,7 +13,7 @@ return new class extends Migration
     {
         $tableName = env('PATHAO_DB_TABLE_NAME', 'pathao_courier_tokens');
 
-        if (!Schema::hasTable($tableName)) {
+        if (! Schema::hasTable($tableName)) {
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->text('access_token');
